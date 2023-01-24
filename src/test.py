@@ -8,7 +8,7 @@ from datetime import date
 
 config = dotenv_values(".env")
 token = config.get('NOTION_TOKEN')
-stockDBid= '1b31ecd513f444299d85b90d818c7e99'
+stockDBid= config.get('STOCK_DB_ID')
 notion = Client(auth=token)
 
 headers = {
@@ -38,5 +38,16 @@ def stock_price_refresh():
         if response.status_code == 200:
             print(ticker + " is Updated")
     
+    refresh_updated_date()
+
+
+def refresh_updated_date():
+    block_id = config.get("STOCK_UPDATE_DATE_BLOCK_ID")
+    block_url = "https://api.notion.com/v1/blocks/" + block_id
+    block = requests.get(block_url, headers=headers).json()
+    today = date.today()
+    d1 = today.strftime("%Y-%m-%d")
+    block['paragraph']['rich_text'][0]['mention']['date']['start'] = d1
+    response = requests.patch(block_url, headers=headers, data=json.dumps(block))
 
 stock_price_refresh()
