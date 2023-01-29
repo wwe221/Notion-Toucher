@@ -31,8 +31,8 @@ def stock_price_refresh():
         prop = item["properties"]
         ticker = prop.get("Ticker").get("title")[0].get("plain_text")
         id = item.get("url").split("-")[1]    
-        ticker_stock = yf.Ticker(ticker).info    
-        market_price = ticker_stock['regularMarketPrice']
+        ticker_stock = yf.Ticker(ticker).fast_info    
+        market_price = ticker_stock['last_price']
         item['properties']['현재가']['number'] = market_price
         response = requests.patch(patch_url + id, headers=headers, data=json.dumps(item))
         if response.status_code == 200:
